@@ -37,14 +37,18 @@ const config = {
   }
   
   function create() {
-    // Přidání pozadí a nastavení jeho vlastností
-    const background = this.add.image(
-      this.cameras.main.width / 2,
-      this.cameras.main.height / 2,
-      "background"
-    );
-    background.setDisplaySize(this.cameras.main.width, this.cameras.main.height);
-    background.setOrigin(0.5, 0.5);
+    // Přidání pozadí a nastavení jeho vlastností s udržením poměru stran
+    const background = this.add.image(0, 0, "background");
+    background.setOrigin(0, 0);
+  
+    let scaleX = this.cameras.main.width / background.width;
+    let scaleY = this.cameras.main.height / background.height;
+    let scale = Math.max(scaleX, scaleY);
+    background.setScale(scale).setScrollFactor(0);
+  
+    // Centrování pozadí
+    background.x = this.cameras.main.width / 2 - (background.width * scale) / 2;
+    background.y = this.cameras.main.height / 2 - (background.height * scale) / 2;
   
     // Definice idle animace
     this.anims.create({
@@ -54,7 +58,9 @@ const config = {
       repeat: -1,
     });
   
-    tomatoes = this.physics.add.group();
+    tomatoes = this.physics.add.group({
+      collideWorldBounds: true
+    });
   
     // Vytvoření plošiny
     platform = this.physics.add.sprite(
@@ -66,6 +72,7 @@ const config = {
     platform.body.allowGravity = false;
     platform.displayWidth = 128;
     platform.displayHeight = 128;
+    platform.setCollideWorldBounds(true);
   
     // Přidání kolize mezi rajčaty a plošinou
     this.physics.add.collider(tomatoes, platform, catchTomato, null, this);
@@ -99,7 +106,7 @@ const config = {
     blackOverlay.depth = 10;
   
     gameOverText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2, 'You lost\nPress any button to start again', {
-      fontSize: '48px',
+      fontSize: '36px',
       fontFamily: '"Press Start 2P"',
       fill: '#fff',
       stroke: '#000',
@@ -110,7 +117,7 @@ const config = {
     gameOverText.setVisible(false);
     gameOverText.depth = 11; // Zajistí, že text je nad overlayem
   
-    // Přidání ovládání
+    // Přidání ovládání klávesnicí
     this.input.keyboard.on('keydown-LEFT', () => {
       platform.setVelocityX(-1000);
     });
@@ -126,6 +133,19 @@ const config = {
       if (platform.body.velocity.x > 0) {
         platform.setVelocityX(0);
       }
+    });
+  
+    // Přidání ovládání myší nebo dotykem
+    this.input.on('pointerdown', (pointer) => {
+      if (pointer.x < this.cameras.main.width / 2) {
+        platform.setVelocityX(-1000);
+      } else {
+        platform.setVelocityX(1000);
+      }
+    });
+  
+    this.input.on('pointerup', () => {
+      platform.setVelocityX(0);
     });
   
     this.input.keyboard.on('keydown', restartGame, this);
