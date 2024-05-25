@@ -1,4 +1,5 @@
-import { addTomato, catchTomato, loseLife, restartGame } from './utils.js';
+import { addTomato, catchTomato, loseLife, restartGame, handleLevelUp, updateSpeedText } from './utils.js';
+import { playerVelocity } from './main.js';
 
 export function create() {
     // Přidání pozadí
@@ -28,9 +29,9 @@ export function create() {
 
     this.anims.create({
         key: "robot_levelup",
-        frames: this.anims.generateFrameNumbers("robot_levelup", { start: 0, end: 6 }),
+        frames: this.anims.generateFrameNumbers("robot_levelup", { start: 0, end: 8 }),
         frameRate: 10,
-        repeat: -1,
+        repeat: 2, // Animaci spustíme dvakrát
     });
 
     // Skupina rajčat
@@ -44,10 +45,12 @@ export function create() {
         .setCollideWorldBounds(true)
         .anims.play("robot_idle");
 
+    this.robot.setVelocityX(0); // Nastavení počáteční rychlosti na 0
+
     this.physics.add.collider(this.tomatoes, this.robot, catchTomato, null, this);
 
     // Časovač pro generování rajčat
-    this.time.addEvent({
+    this.tomatoTimer = this.time.addEvent({
         delay: 1000,
         callback: () => addTomato(this),
         loop: true,
@@ -74,9 +77,10 @@ export function create() {
     });
 
     // Overlay a game over text
-    this.blackOverlay = this.add.rectangle(0, 0, window.innerWidth, window.innerHeight, 0x000000, 0)
+    this.blackOverlay = this.add.rectangle(0, 0, window.innerWidth, window.innerHeight, 0x000000, 0.5)
         .setOrigin(0, 0)
-        .setDepth(10);
+        .setDepth(10)
+        .setVisible(false);
 
     this.gameOverText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2, 'You lost\nPress any button to start again', {
         fontSize: '36px',
@@ -87,9 +91,28 @@ export function create() {
         align: 'center',
     }).setOrigin(0.5, 0.5).setVisible(false).setDepth(11);
 
+    // Power-up tlačítko
+    this.coffeePowerUp = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'coffee_powerup')
+        .setDisplaySize(128, 128)
+        .setOrigin(0.5, 0.5)
+        .setDepth(12) // Zajistí, že bude nad overlayem
+        .setVisible(false)
+        .setInteractive()
+        .on('pointerdown', () => handleLevelUp(this));
+
+    // Text rychlosti pod power-upem
+    this.speedText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 80, 'Speed: 5 (+1)', {
+        fontSize: '24px',
+        fontFamily: '"Press Start 2P"',
+        fill: '#fff',
+        stroke: '#000',
+        strokeThickness: 8,
+        align: 'center',
+    }).setOrigin(0.5, 0.5).setVisible(false).setDepth(13); // Zajistí, že bude nad overlayem
+
     // Ovládání
-    this.input.keyboard.on('keydown-LEFT', () => this.robot.setVelocityX(-1000));
-    this.input.keyboard.on('keydown-RIGHT', () => this.robot.setVelocityX(1000));
+    this.input.keyboard.on('keydown-LEFT', () => this.robot.setVelocityX(-playerVelocity));
+    this.input.keyboard.on('keydown-RIGHT', () => this.robot.setVelocityX(playerVelocity));
     this.input.keyboard.on('keyup-LEFT', () => {
         if (this.robot.body.velocity.x < 0) this.robot.setVelocityX(0);
     });
@@ -99,9 +122,9 @@ export function create() {
 
     this.input.on('pointerdown', (pointer) => {
         if (pointer.x < this.cameras.main.width / 2) {
-            this.robot.setVelocityX(-1000);
+            this.robot.setVelocityX(-playerVelocity);
         } else {
-            this.robot.setVelocityX(1000);
+            this.robot.setVelocityX(playerVelocity);
         }
     });
 

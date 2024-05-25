@@ -2,6 +2,8 @@ import { preload } from './preload.js';
 import { create } from './create.js';
 import { update } from './update.js';
 
+export let playerVelocity = 500; // Počáteční rychlost
+
 const config = {
     type: Phaser.AUTO,
     width: window.innerWidth,
@@ -22,3 +24,4 @@ const config = {
 
 const game = new Phaser.Game(config);
 export default game;
+

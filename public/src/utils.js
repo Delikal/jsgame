@@ -1,3 +1,5 @@
+import game, { playerVelocity } from './main.js';
+
 export function addTomato(scene) {
     const x = Phaser.Math.Between(0, scene.game.config.width);
     const tomato = scene.tomatoes.create(x, 0, "tomato");
@@ -18,8 +20,9 @@ export function catchTomato(robot, tomato) {
 
     if (scene.score % scene.levelUpScore === 0) {
         robot.anims.play("robot_levelup");
-        scene.time.delayedCall(1000, () => {
-            robot.anims.play("robot_idle");
+        scene.time.delayedCall(1800, () => { // Počkáme na dokončení animace dvakrát
+            pauseGame(scene);
+            showPowerUp(scene);
         });
     }
 }
@@ -55,4 +58,31 @@ export function restartGame(scene, event) {
         scene.blackOverlay.fillAlpha = 0;
         scene.gameOverText.setVisible(false);
     }
+}
+
+export function pauseGame(scene) {
+    scene.physics.pause();
+    scene.tomatoTimer.paused = true;
+    scene.blackOverlay.setVisible(true);
+}
+
+export function showPowerUp(scene) {
+    scene.coffeePowerUp.setVisible(true);
+    scene.speedText.setVisible(true);
+}
+
+export function handleLevelUp(scene) {
+    scene.robot.anims.play("robot_idle"); // Vrátí animaci zpět na idle
+    game.playerVelocity += 100; // Aktualizuje globální rychlost
+    updateSpeedText(scene, game.playerVelocity / 100);
+    scene.coffeePowerUp.setVisible(false);
+    scene.speedText.setVisible(false);
+    scene.blackOverlay.setVisible(false);
+    scene.blackOverlay.fillAlpha = 0;
+    scene.physics.resume();
+    scene.tomatoTimer.paused = false;
+}
+
+export function updateSpeedText(scene, speedLevel) {
+    scene.speedText.setText(`Speed: ${speedLevel} (+1)`);
 }
