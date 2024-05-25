@@ -1,0 +1,45 @@
+V projektu jsou následující soubory a jejich účely:
+
+- `index.html`: Základní HTML soubor, který načítá Phaser a `main.js`.
+- `src/main.js`: Hlavní soubor, který obsahuje konfiguraci Phaseru a inicializaci hry. Importuje a používá funkce z `preload.js`, `create.js` a `update.js`.
+- `src/preload.js`: Obsahuje funkci `preload`, která načítá všechny potřebné assety (pozadí, sprite sheet pro rajčata a robota, animace level up).
+- `src/create.js`: Obsahuje funkci `create`, která nastavuje scénu, animace, kolize, texty a ovládání.
+- `src/update.js`: Obsahuje funkci `update`, která se vykonává v každém herním cyklu a zahrnuje logiku hry (kontrolu, zda rajčata spadla mimo obrazovku).
+- `src/utils.js`: Obsahuje pomocné funkce:
+  - `addTomato`: Přidá nové rajče do hry.
+  - `catchTomato`: Zpracuje logiku při chycení rajčete robotem, aktualizuje skóre a spustí animaci level up.
+  - `loseLife`: Odebere život při ztrátě rajčete, kontroluje konec hry.
+  - `restartGame`: Restartuje hru po skončení.
+
+Struktura projektu:
+- `/game`
+  - `/assets`: Složka obsahující obrázky a sprite sheety.
+    - `background.webp`
+    - `robot_idle.png`
+    - `robot_levelup.png`
+    - `tomato.png`
+  - `/src`: Složka obsahující JavaScript soubory.
+    - `main.js`
+    - `preload.js`
+    - `create.js`
+    - `update.js`
+    - `utils.js`
+  - `index.html`
+
+Přidávání nových věcí a funkcí:
+- Pro přidání nového assetu, jako je obrázek nebo sprite sheet:
+  1. Uložte nový asset do složky `/assets`.
+  2. Načtěte asset v `preload.js` pomocí `this.load.image` nebo `this.load.spritesheet`.
+
+- Pro přidání nové animace:
+  1. Vytvořte animaci v `create.js` pomocí `this.anims.create`.
+  2. Ujistěte se, že jsou správně nastaveny klíče a frame numbers.
+
+- Pro přidání nové herní logiky nebo funkcionality:
+  1. Vytvořte nové funkce v `utils.js`.
+  2. Importujte a použijte tyto funkce v `create.js` nebo `update.js`.
+
+- Pro změnu ovládání:
+  1. Upravit event listener v `create.js`, například `this.input.keyboard.on` nebo `this.input.on`.
+
+Tímto způsobem je kód modularizován, což usnadňuje jeho údržbu a rozšíření.

@@ -26,6 +26,7 @@ let livesText;
 let gameOverText;
 let blackOverlay;
 let isGameOver = false;
+let levelUpScore = 100;
 
 function preload() {
   this.load.image("background", "background.webp");
@@ -33,7 +34,8 @@ function preload() {
     frameWidth: 128,
     frameHeight: 128,
   });
-  this.load.spritesheet("robot", "robot.png", { frameWidth: 128, frameHeight: 256 }); // Robot má 1 column a 9 rows pro idle animation
+  this.load.spritesheet("robot", "robot_idle.png", { frameWidth: 128, frameHeight: 256 }); // Robot má 1 column a 9 rows pro idle animation
+  this.load.spritesheet("robot_levelup", "robot_levelup.png", { frameWidth: 128, frameHeight: 256 }); // Robot má 1 column a 9 rows pro level up animation
 }
 
 function create() {
@@ -62,6 +64,14 @@ function create() {
   this.anims.create({
     key: "robot_idle",
     frames: this.anims.generateFrameNumbers("robot", { start: 0, end: 8 }),
+    frameRate: 10,
+    repeat: -1,
+  });
+
+  // Definice level up animace pro robota
+  this.anims.create({
+    key: "robot_levelup",
+    frames: this.anims.generateFrameNumbers("robot_levelup", { start: 0, end: 6 }),
     frameRate: 10,
     repeat: -1,
   });
@@ -185,6 +195,15 @@ function catchTomato(robot, tomato) {
   tomato.disableBody(true, true);
   score += 10;
   scoreText.setText("Score: " + score);
+  
+  // Kontrola, zda je potřeba spustit animaci level up
+  if (score % levelUpScore === 0) {
+    robot.anims.play("robot_levelup");
+    // Po skončení level up animace se vrátí zpět do idle animace
+    this.time.delayedCall(1000, () => {
+      robot.anims.play("robot_idle");
+    });
+  }
 }
 
 function loseLife() {
