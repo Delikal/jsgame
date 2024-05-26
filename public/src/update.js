@@ -7,4 +7,11 @@ export function update() {
             loseLife(this);
         }
     }, this);
+
+    this.clouds.children.iterate(cloud => {
+        if (cloud && cloud.x + cloud.width < 0) {
+            cloud.destroy();
+        }
+    });
+    
 }

@@ -1,4 +1,4 @@
-import game, { playerVelocity } from './main.js';
+import game, { getPlayerVelocity, increasePlayerVelocity } from './main.js';
 
 export function addTomato(scene) {
     const x = Phaser.Math.Between(0, scene.game.config.width);
@@ -63,6 +63,7 @@ export function restartGame(scene, event) {
 export function pauseGame(scene) {
     scene.physics.pause();
     scene.tomatoTimer.paused = true;
+    scene.cloudTimer.paused = true;
     scene.blackOverlay.setVisible(true);
 }
 
@@ -73,13 +74,14 @@ export function showPowerUp(scene) {
 
 export function handleLevelUp(scene) {
     scene.robot.anims.play("robot_idle"); // Vrátí animaci zpět na idle
-    game.playerVelocity += 100; // Aktualizuje globální rychlost
-    updateSpeedText(scene, game.playerVelocity / 100);
+    increasePlayerVelocity(100); // Aktualizuje globální rychlost
+    updateSpeedText(scene, getPlayerVelocity() / 100);
     scene.coffeePowerUp.setVisible(false);
     scene.speedText.setVisible(false);
     scene.blackOverlay.setVisible(false);
     scene.blackOverlay.fillAlpha = 0;
     scene.physics.resume();
+    scene.cloudTimer.paused = false;
     scene.tomatoTimer.paused = false;
 }
 

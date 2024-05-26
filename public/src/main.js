@@ -2,7 +2,10 @@ import { preload } from './preload.js';
 import { create } from './create.js';
 import { update } from './update.js';
 
-export let playerVelocity = 500; // Počáteční rychlost
+let playerVelocity = 500; // Počáteční rychlost
+
+export const getPlayerVelocity = () => playerVelocity;
+export const increasePlayerVelocity = (value) => playerVelocity += value;
 
 const config = {
     type: Phaser.AUTO,
